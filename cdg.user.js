@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Canvas Dashboard Grades
-// @namespace    https://itsmeow.cat
+// @namespace    https://xela.codes
 // @version      2025-01-07
 // @description  Modern alternative to the Canvas Dashboard Grades extension.
 // @author       Alex
@@ -32,7 +32,7 @@
     enrolledCourses.forEach((course) => {
       /** course card header element */
       const courseCard = document.querySelector(
-          `.ic-DashboardCard a[href=\"/courses/${course.id}\"]`
+          `.ic-DashboardCard a[href="/courses/${course.id}"]`
         )?.parentElement,
         hero = courseCard?.querySelector(".ic-DashboardCard__header_hero"),
         /** course enrollment information (contains grade) */
@@ -40,6 +40,7 @@
       if (!courseCard || !hero || !enrollment)
         return console.error(`Failed to add grade for course ${course.name}.`);
 
+      // use the course color for text
       const color = hero.style?.backgroundColor || "inherit";
 
       const title = document.createElement("span");
@@ -55,6 +56,7 @@
       title.style.top = title.style.left = "0.35rem";
       title.style.fontWeight = "bold";
       title.innerText =
+        // the enrollment contains the current grade
         enrollment.computed_current_score == null ? "N/A" : `${enrollment.computed_current_score}%`;
       courseCard.appendChild(title);
 
@@ -71,6 +73,9 @@
     });
   }
   doGrades();
+
+  // sometimes the page gets re-rendered, removing the grades
+  // so we check every so often to make sure they're still there
   if (enrolledCourses?.length)
     setInterval(() => {
       if (!document.querySelector(".cdg-grade")) doGrades();
